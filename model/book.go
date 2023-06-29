@@ -1,6 +1,6 @@
 package model
 
 type Book struct {
-	id   int
+	Id   int
 	Name string
 }
