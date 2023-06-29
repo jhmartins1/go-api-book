@@ -2,21 +2,35 @@ package main
 
 import (
 	"fmt"
+	"golang-crud/config"
+	"golang-crud/controller"
 	"golang-crud/helper"
+	"golang-crud/repository"
+	"golang-crud/router"
+	"golang-crud/service"
 	"net/http"
-
-	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
-	fmt.Printf("Start main")
+	fmt.Printf("Start server")
+	// database
+	db := config.DatabaseConnection()
 
-	routes := httprouter.New()
-	routes.GET("/", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		fmt.Fprint(w, "Welcome Home")
-	})
+	// repository
+	bookRepository := repository.NewBookRepository(db)
+
+	// service
+	bookService := service.NewBookServiceImpl(bookRepository)
+
+	// controller
+	bookController := controller.NewBookController(bookService)
+
+	// router
+	routes := router.NewRouter(bookController)
+
 	server := http.Server{Addr: "localhost:8888", Handler: routes}
 
 	err := server.ListenAndServe()
 	helper.PanicIfError(err)
+
 }
